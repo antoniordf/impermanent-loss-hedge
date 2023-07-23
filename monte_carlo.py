@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from black_scholes import black_scholes
-from provider_payoff import liquidity_provider_payoff_v3
-from save_csv import save_to_csv
 
 # Set the parameters
 NUM_SIMULATIONS = 100
@@ -22,12 +20,6 @@ previous_position_value = SUPPLIED_PRICE * SUPPLIED_AMOUNT
 
 # Create an empty matrix to hold the end price data
 all_simulated_price = np.zeros((NUM_SIMULATIONS, NUM_DAYS))
-
-# Create an empty matrix to hold the provider payoff data
-all_simulated_provider_payoff = np.zeros((NUM_SIMULATIONS, NUM_DAYS))
-
-# Create an empty matrix to hold the portfolio value data
-all_simulated_provider_payoff_with_options = np.zeros((NUM_SIMULATIONS, NUM_DAYS))
 
 # Create an empty matrix to hold the options value data
 all_simulated_options_value = np.zeros((NUM_SIMULATIONS, NUM_DAYS))
@@ -57,14 +49,6 @@ for x in range(NUM_SIMULATIONS):
 
     # Append the end price of each simulation to the matrix
     all_simulated_price[x] = price_series[-1]
-
-    # # Calculate the liquidity provider payoffs each day
-    # provider_payoff = SUPPLIED_AMOUNT * liquidity_provider_payoff_v3(
-    #     SUPPLIED_PRICE, price_series, fee=0.003
-    # )
-    # all_simulated_provider_payoff[x] = provider_payoff
-
-    # position_value = previous_position_value + provider_payoff
 
     # Initialize the options_value array
     options_value = np.zeros(NUM_DAYS)
@@ -98,17 +82,6 @@ for x in range(NUM_SIMULATIONS):
 
     all_simulated_options_value[x] = options_value
 
-    # # Calculate liquidity providers payoff including options hedge
-    # if x == 0:  # For the first simulation, there's no previous day
-    #     provider_payoff_with_options = provider_payoff + all_simulated_options_value[0]
-    # else:
-    #     provider_payoff_with_options = provider_payoff + all_simulated_options_value[x]
-    # all_simulated_provider_payoff_with_options[x] = provider_payoff_with_options
-
-# print("provider payoff", all_simulated_provider_payoff)
-# print("provider payoff with options", all_simulated_provider_payoff_with_options)
-# print("options value", options_value[x])
-
 min_value = min(np.min(unhedged_positions), np.min(hedged_positions))
 max_value = max(np.max(unhedged_positions), np.max(hedged_positions))
 
@@ -119,18 +92,7 @@ for position_value in unhedged_positions:
     plt.plot(position_value)
 plt.ylim([min_value, max_value + 1000])
 
-# Plot the liquidity provider payoff with options each day
-# plt.figure(3)
-# plt.title("Liquidity Provider Payoff with Hedge Over Time")
-# for provider_payoff in all_simulated_provider_payoff_with_options:
-#     plt.plot(provider_payoff)
-
-# plt.figure(4)
-# plt.title("Options Value Over Time")
-# for options_value in all_simulated_options_value:
-#     plt.plot(options_value)
-
-plt.figure(5)
+plt.figure(3)
 plt.title("LP Hedged Pool")
 for total_value in hedged_positions:
     plt.plot(total_value)
